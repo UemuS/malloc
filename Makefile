@@ -1,5 +1,5 @@
 CC=gcc
-CFLAGS=-O2 -fPIC -Iinclude
+CFLAGS=-Werror -Wextra -Wall -O2 -fPIC -Iinclude
 LDFLAGS=-shared -pthread
 HOSTTYPE ?= $(shell uname -m)_$(shell uname -s)
 TARGET=libft_malloc_$(HOSTTYPE).so

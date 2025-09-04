@@ -50,12 +50,34 @@ void *realloc(void *ptr, size_t size) {
     }
 
     size_t aligned = align_up(size);
+    
     // Large path
     if (aligned > SMALL_MAX)
         return realloc_large(ptr, size);
 
-    // Tiny/small path: simple alloc+copy+free
-    void *newp = malloc(size);
+    // For tiny and small, check if we can reuse the same block
+    char *cptr = (char*)ptr;
+    
+    // Check if it's in tiny zone
+    if (cptr >= (char*)tiny_zone_base && 
+        cptr < (char*)tiny_zone_base + TINY_ZONE_SIZE) {
+        // If new size still fits in tiny zone, we can reuse the block
+        if (aligned <= TINY_MAX) {
+            return ptr;  // Same block can be reused
+        }
+    }
+    
+    // Check if it's in small zone
+    else if (cptr >= (char*)small_zone_base && 
+             cptr < (char*)small_zone_base + SMALL_ZONE_SIZE) {
+        // If new size still fits in small zone, we can reuse the block
+        if (aligned <= SMALL_MAX) {
+            return ptr;  // Same block can be reused
+        }
+    }
+    
+    // Need to allocate new memory and copy
+    void *newp = malloc(aligned);
     if (!newp)
         return NULL;
     memcpy(newp, ptr, size);

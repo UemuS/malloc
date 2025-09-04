@@ -12,8 +12,11 @@
 // Chunk header for large allocations
 typedef struct s_large_chunk {
     size_t size;
+    struct s_large_chunk *next;
 } t_large_chunk;
 
+// Global linked list head for large allocations
+void *large_allocations_head = NULL;
 
 void *alloc_large(size_t aligned_sz) {
     size_t total = aligned_sz + sizeof(t_large_chunk);
@@ -31,6 +34,11 @@ void *alloc_large(size_t aligned_sz) {
 
     t_large_chunk *chunk = (t_large_chunk *)mem;
     chunk->size = aligned_sz;
+    
+    // Add to global linked list for tracking
+    chunk->next = large_allocations_head;
+    large_allocations_head = chunk;
+    
     // Return pointer to payload region after header
     return (void *)(chunk + 1);
 }
@@ -39,6 +47,20 @@ void *alloc_large(size_t aligned_sz) {
 void free_large(void *ptr) {
     if (!ptr) return;
     t_large_chunk *chunk = (t_large_chunk *)ptr - 1;
+    
+    // Remove from global linked list
+    if (large_allocations_head == chunk) {
+        large_allocations_head = chunk->next;
+    } else {
+        t_large_chunk *current = large_allocations_head;
+        while (current && current->next != chunk) {
+            current = current->next;
+        }
+        if (current) {
+            current->next = chunk->next;
+        }
+    }
+    
     size_t total = chunk->size + sizeof(t_large_chunk);
     size_t pg = (size_t)getpagesize();
     size_t rem = total % pg;
