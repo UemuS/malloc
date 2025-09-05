@@ -9,30 +9,15 @@
 #include "util/util.h"
 #include "libft.h"
 #include "ft_printf/includes/libftprintf.h"
+#include "global_malloc.h"
 #include <unistd.h>
 
-// Chunk header structure (same as in zones.c)
-typedef struct s_chunk {
-    struct s_chunk *next;
-    size_t          size;
-    int             free;
-} t_chunk;
-
-// Large chunk header structure (same as in large.c)
-typedef struct s_large_chunk {
-    size_t size;
-    struct s_large_chunk *next;
-} t_large_chunk;
-
-// Global variables for large allocations tracking
-extern void *large_allocations_head;
-
 void show_alloc_mem(void) {
-    ft_printf("TINY : %p\n", tiny_zone_base);
+    ft_printf("TINY : %p\n", g_malloc.tiny_zone_base);
     
-    if (tiny_zone_base) {
-        char *zone_end = (char*)tiny_zone_base + TINY_ZONE_SIZE;
-        char *p = tiny_zone_base;
+    if (g_malloc.tiny_zone_base) {
+        char *zone_end = (char*)g_malloc.tiny_zone_base + g_malloc.tiny_zone_size;
+        char *p = g_malloc.tiny_zone_base;
         
         while (p < zone_end) {
             t_chunk *c = (t_chunk *)p;
@@ -47,11 +32,11 @@ void show_alloc_mem(void) {
         }
     }
     
-    ft_printf("SMALL : %p\n", small_zone_base);
+    ft_printf("SMALL : %p\n", g_malloc.small_zone_base);
     
-    if (small_zone_base) {
-        char *zone_end = (char*)small_zone_base + SMALL_ZONE_SIZE;
-        char *p = small_zone_base;
+    if (g_malloc.small_zone_base) {
+        char *zone_end = (char*)g_malloc.small_zone_base + g_malloc.small_zone_size;
+        char *p = g_malloc.small_zone_base;
         
         while (p < zone_end) {
             t_chunk *c = (t_chunk *)p;
@@ -66,10 +51,10 @@ void show_alloc_mem(void) {
         }
     }
     
-    ft_printf("LARGE : %p\n", large_allocations_head);
+    ft_printf("LARGE : %p\n", g_malloc.large_allocations_head);
     
     // Display large allocations
-    t_large_chunk *current = large_allocations_head;
+    t_large_chunk *current = g_malloc.large_allocations_head;
     while (current) {
         ft_printf("%p - %p : %zu bytes\n",
                (void*)(current + 1),

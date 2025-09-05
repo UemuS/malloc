@@ -2,8 +2,9 @@
 #include "util/util.h"
 #include "zones.h"    // alloc_tiny, free_tiny, alloc_small, free_small
 #include "large.h"    // alloc_large, free_large, realloc_large
+#include "libft.h"    // ft_memcpy for realloc
+#include "global_malloc.h"
 #include <stddef.h>
-#include <string.h>    // ft_memcpy for realloc
 
 void *malloc(size_t size) {
     if (size == 0)
@@ -26,13 +27,13 @@ void free(void *ptr) {
 
 		char *cptr = (char*)ptr;
 
-		if (cptr >= (char*)tiny_zone_base
-		 && cptr <  (char*)tiny_zone_base + TINY_ZONE_SIZE)
+		if (cptr >= (char*)g_malloc.tiny_zone_base
+		 && cptr <  (char*)g_malloc.tiny_zone_base + g_malloc.tiny_zone_size)
 		{
 			free_tiny(ptr);
 		}
-		else if (cptr >= (char*)small_zone_base
-			  && cptr <  (char*)small_zone_base + SMALL_ZONE_SIZE)
+		else if (cptr >= (char*)g_malloc.small_zone_base
+			  && cptr <  (char*)g_malloc.small_zone_base + g_malloc.small_zone_size)
 		{
 			free_small(ptr);
 		}
@@ -59,8 +60,8 @@ void *realloc(void *ptr, size_t size) {
     char *cptr = (char*)ptr;
     
     // Check if it's in tiny zone
-    if (cptr >= (char*)tiny_zone_base && 
-        cptr < (char*)tiny_zone_base + TINY_ZONE_SIZE) {
+    if (cptr >= (char*)g_malloc.tiny_zone_base && 
+        cptr < (char*)g_malloc.tiny_zone_base + g_malloc.tiny_zone_size) {
         // If new size still fits in tiny zone, we can reuse the block
         if (aligned <= TINY_MAX) {
             return ptr;  // Same block can be reused
@@ -68,8 +69,8 @@ void *realloc(void *ptr, size_t size) {
     }
     
     // Check if it's in small zone
-    else if (cptr >= (char*)small_zone_base && 
-             cptr < (char*)small_zone_base + SMALL_ZONE_SIZE) {
+    else if (cptr >= (char*)g_malloc.small_zone_base && 
+             cptr < (char*)g_malloc.small_zone_base + g_malloc.small_zone_size) {
         // If new size still fits in small zone, we can reuse the block
         if (aligned <= SMALL_MAX) {
             return ptr;  // Same block can be reused

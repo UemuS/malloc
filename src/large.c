@@ -4,19 +4,11 @@
 
 #include "ft_malloc.h"
 #include "util/util.h"    // for getpagesize()
+#include "libft.h"        // ft_memcpy
+#include "global_malloc.h"
 #include <sys/mman.h>
-#include <string.h>        // ft_memcpy
 #include <errno.h>
 #include "large.h"
-
-// Chunk header for large allocations
-typedef struct s_large_chunk {
-    size_t size;
-    struct s_large_chunk *next;
-} t_large_chunk;
-
-// Global linked list head for large allocations
-void *large_allocations_head = NULL;
 
 void *alloc_large(size_t aligned_sz) {
     size_t total = aligned_sz + sizeof(t_large_chunk);
@@ -36,8 +28,8 @@ void *alloc_large(size_t aligned_sz) {
     chunk->size = aligned_sz;
     
     // Add to global linked list for tracking
-    chunk->next = large_allocations_head;
-    large_allocations_head = chunk;
+    chunk->next = g_malloc.large_allocations_head;
+    g_malloc.large_allocations_head = chunk;
     
     // Return pointer to payload region after header
     return (void *)(chunk + 1);
@@ -49,10 +41,10 @@ void free_large(void *ptr) {
     t_large_chunk *chunk = (t_large_chunk *)ptr - 1;
     
     // Remove from global linked list
-    if (large_allocations_head == chunk) {
-        large_allocations_head = chunk->next;
+    if (g_malloc.large_allocations_head == chunk) {
+        g_malloc.large_allocations_head = chunk->next;
     } else {
-        t_large_chunk *current = large_allocations_head;
+        t_large_chunk *current = g_malloc.large_allocations_head;
         while (current && current->next != chunk) {
             current = current->next;
         }

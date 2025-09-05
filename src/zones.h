@@ -7,6 +7,7 @@
 #define ZONES_H
 
 #include <stddef.h>
+#include "global_malloc.h"
 
 /* Tiny allocator (≤ TINY_MAX) */
 void *alloc_tiny(size_t aligned_sz);
@@ -16,11 +17,7 @@ void  free_tiny(void *ptr);
 void *alloc_small(size_t aligned_sz);
 void  free_small(void *ptr);
 
-/* Zone base pointers and sizes for free() dispatch */
-extern void  *tiny_zone_base;
-extern size_t TINY_ZONE_SIZE;
-
-extern void  *small_zone_base;
-extern size_t SMALL_ZONE_SIZE;
+/* Access to global malloc structure */
+extern t_malloc_global g_malloc;
 
 #endif // ZONES_H
