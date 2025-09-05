@@ -3,7 +3,7 @@
 #include "zones.h"    // alloc_tiny, free_tiny, alloc_small, free_small
 #include "large.h"    // alloc_large, free_large, realloc_large
 #include <stddef.h>
-#include <string.h>    // memcpy for realloc
+#include <string.h>    // ft_memcpy for realloc
 
 void *malloc(size_t size) {
     if (size == 0)
@@ -80,7 +80,7 @@ void *realloc(void *ptr, size_t size) {
     void *newp = malloc(aligned);
     if (!newp)
         return NULL;
-    memcpy(newp, ptr, size);
+    ft_memcpy(newp, ptr, size);
     free(ptr);
     return newp;
 }

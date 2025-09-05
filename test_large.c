@@ -10,7 +10,6 @@ int main(void) {
     /* Choose a size definitely > SMALL_MAX (e.g., 2000 bytes) */
     const size_t N = 2000;
 
-    printf("→ malloc(%zu) → alloc_large path\n", N);
     unsigned char *p = malloc(N);
     if (!p) {
         fprintf(stderr, "malloc failed");
@@ -26,7 +25,6 @@ int main(void) {
             return 2;
         }
     }
-    printf("  fill/read test passed\n");
 
     /* Test realloc growing */
     size_t M = N + 4096;

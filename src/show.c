@@ -7,7 +7,8 @@
 #include "zones.h"
 #include "large.h"
 #include "util/util.h"
-#include <stdio.h>
+#include "libft.h"
+#include "ft_printf/includes/libftprintf.h"
 #include <unistd.h>
 
 // Chunk header structure (same as in zones.c)
@@ -27,7 +28,7 @@ typedef struct s_large_chunk {
 extern void *large_allocations_head;
 
 void show_alloc_mem(void) {
-    printf("TINY : %p\n", tiny_zone_base);
+    ft_printf("TINY : %p\n", tiny_zone_base);
     
     if (tiny_zone_base) {
         char *zone_end = (char*)tiny_zone_base + TINY_ZONE_SIZE;
@@ -37,7 +38,7 @@ void show_alloc_mem(void) {
             t_chunk *c = (t_chunk *)p;
             // Only show chunks that are allocated and have valid size
             if (c->free == 0 && c->size > 0 && c->size <= TINY_MAX) {
-                printf("%p - %p : %zu bytes\n", 
+                ft_printf("%p - %p : %zu bytes\n", 
                        (void*)(c + 1), 
                        (void*)((char*)(c + 1) + c->size - 1),
                        c->size);
@@ -46,7 +47,7 @@ void show_alloc_mem(void) {
         }
     }
     
-    printf("SMALL : %p\n", small_zone_base);
+    ft_printf("SMALL : %p\n", small_zone_base);
     
     if (small_zone_base) {
         char *zone_end = (char*)small_zone_base + SMALL_ZONE_SIZE;
@@ -56,7 +57,7 @@ void show_alloc_mem(void) {
             t_chunk *c = (t_chunk *)p;
             // Only show chunks that are allocated and have valid size
             if (c->free == 0 && c->size > 0 && c->size <= SMALL_MAX) {
-                printf("%p - %p : %zu bytes\n", 
+                ft_printf("%p - %p : %zu bytes\n", 
                        (void*)(c + 1), 
                        (void*)(c + 1) + c->size - 1,
                        c->size);
@@ -65,12 +66,12 @@ void show_alloc_mem(void) {
         }
     }
     
-    printf("LARGE : %p\n", large_allocations_head);
+    ft_printf("LARGE : %p\n", large_allocations_head);
     
     // Display large allocations
     t_large_chunk *current = large_allocations_head;
     while (current) {
-        printf("%p - %p : %zu bytes\n",
+        ft_printf("%p - %p : %zu bytes\n",
                (void*)(current + 1),
                (void*)((char*)(current + 1) + current->size - 1),
                current->size);

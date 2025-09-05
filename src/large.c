@@ -5,7 +5,7 @@
 #include "ft_malloc.h"
 #include "util/util.h"    // for getpagesize()
 #include <sys/mman.h>
-#include <string.h>        // memcpy
+#include <string.h>        // ft_memcpy
 #include <errno.h>
 #include "large.h"
 
@@ -83,7 +83,7 @@ void *realloc_large(void *ptr, size_t new_sz) {
     // Need a new block
     void *newp = alloc_large(aligned_new);
     if (!newp) return NULL;
-    memcpy(newp, ptr, old_sz);
+    ft_memcpy(newp, ptr, old_sz);
     free_large(ptr);
     return newp;
 }
